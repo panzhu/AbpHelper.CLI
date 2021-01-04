@@ -48,13 +48,13 @@ $(function () {
                                 },
                                 action: function (data) {
 {{~ if EntityInfo.CompositeKeyName ~}}
-                                        service.delete({
+                                    service.delete({
     {{~ for prop in EntityInfo.CompositeKeys ~}}
                                             {{ prop.Name | abp.camel_case}}: data.record.{{ prop.Name | abp.camel_case}}{{if !for.last}},{{end}}
     {{~ end ~}}
                                         })
 {{~ else ~}}
-                                        service.delete(data.record.id)
+                                    service.delete(data.record.id)
 {{~ end ~}}
                                         .then(function () {
                                             abp.notify.info(l('SuccessfullyDeleted'));
@@ -66,8 +66,11 @@ $(function () {
                 }
             },
             {{~ for prop in EntityInfo.Properties ~}}
-            {{~ if prop | abp.is_ignore_property; continue; end ~}} 
-            { data: "{{ prop.Name | abp.camel_case }}" },
+            {{~ if prop | abp.is_ignore_property; continue; end ~}}
+            {
+                title: l('{{ EntityInfo.Name + prop.Name }}'),
+                data: "{{ prop.Name | abp.camel_case }}"
+            },
             {{~ end ~}}
         ]
     }));

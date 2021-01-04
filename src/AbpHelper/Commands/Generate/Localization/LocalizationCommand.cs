@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using EasyAbp.AbpHelper.Steps.Abp;
 using EasyAbp.AbpHelper.Steps.Common;
+using EasyAbp.AbpHelper.Workflow;
+using EasyAbp.AbpHelper.Workflow.Generate;
 using Elsa;
 using Elsa.Activities;
 using Elsa.Activities.ControlFlow.Activities;
@@ -21,10 +24,11 @@ namespace EasyAbp.AbpHelper.Commands.Generate.Localization
         protected override IActivityBuilder ConfigureBuild(LocalizationCommandOption option, IActivityBuilder activityBuilder)
         {
             return base.ConfigureBuild(option, activityBuilder)
+                .AddOverwriteWorkflow()
                 .Then<SetVariable>(
                     step =>
                     {
-                        step.VariableName = "TemplateDirectory";
+                        step.VariableName = VariableNames.TemplateDirectory;
                         step.ValueExpression = new LiteralExpression<string>("/Templates/Localization");
                     })
                 .Then<SetModelVariableStep>()

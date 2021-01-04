@@ -34,7 +34,6 @@ namespace EasyAbp.AbpHelper.Commands
         protected virtual string OptionVariableName => CommandConsts.OptionVariableName;
         protected virtual string BaseDirectoryVariableName => CommandConsts.BaseDirectoryVariableName;
         protected virtual string ExcludeDirectoriesVariableName => CommandConsts.ExcludeDirectoriesVariableName;
-        protected virtual string OverwriteVariableName => CommandConsts.OverwriteVariableName;
 
         public ILogger<CommandWithOption<TOption>> Logger { get; set; }
 
@@ -42,7 +41,7 @@ namespace EasyAbp.AbpHelper.Commands
         {
             option.Directory = GetBaseDirectory(option.Directory);
 
-            await ServiceProvider.GetService<ICheckUpdateService>().CheckUpdate();
+            await ServiceProvider.GetRequiredService<ICheckUpdateService>().CheckUpdate();
 
             await RunWorkflow(builder =>
             {
@@ -64,12 +63,6 @@ namespace EasyAbp.AbpHelper.Commands
                         {
                             step.VariableName = ExcludeDirectoriesVariableName;
                             step.ValueExpression = new JavaScriptExpression<string[]>($"{OptionVariableName}.{nameof(CommandOptionsBase.Exclude)}");
-                        })
-                    .Then<SetVariable>(
-                        step =>
-                        {
-                            step.VariableName = OverwriteVariableName;
-                            step.ValueExpression = new JavaScriptExpression<bool>($"!{OptionVariableName}.{nameof(CommandOptionsBase.NoOverwrite)}");
                         })
                     .Then<ProjectInfoProviderStep>()
                     ;
@@ -108,7 +101,7 @@ namespace EasyAbp.AbpHelper.Commands
             var workflowDefinition = builder(workflowBuilder);
             // Start the workflow.
             Logger.LogInformation($"Command '{Name}' started.");
-            var invoker = ServiceProvider.GetService<IWorkflowInvoker>();
+            var invoker = ServiceProvider.GetRequiredService<IWorkflowInvoker>();
             var ctx = await invoker.StartAsync(workflowDefinition);
             if (ctx.Workflow.Status == WorkflowStatus.Finished)
             {
